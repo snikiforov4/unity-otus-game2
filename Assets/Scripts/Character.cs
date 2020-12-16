@@ -1,50 +1,66 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    Rigidbody2D rigidBody2D;
-    TriggerDetector triggerDetector;
-    Animator animator;
-    float visualDirection;
+    private static readonly int SpeedX = Animator.StringToHash("speed");
+    private static readonly int SpeedY = Animator.StringToHash("vertical speed");
+    private static readonly int InAir = Animator.StringToHash("in air");
+
+    private Rigidbody2D _rigidBody2D;
+    private TriggerDetector _triggerDetector;
+    private Animator _animator;
+    private float _visualDirection;
 
     public Transform visual;
     public float moveForce;
+    public float jumpForceX;
+    public float jumpForceY;
 
     void Start()
     {
-        rigidBody2D = GetComponent<Rigidbody2D>();
-        triggerDetector = GetComponentInChildren<TriggerDetector>();
-        animator = GetComponentInChildren<Animator>();
-        visualDirection = 1.0f;
+        _rigidBody2D = GetComponent<Rigidbody2D>();
+        _triggerDetector = GetComponentInChildren<TriggerDetector>();
+        _animator = GetComponentInChildren<Animator>();
+        _visualDirection = 1.0f;
     }
 
     public void MoveLeft()
     {
-        if (triggerDetector.inTrigger)
-            rigidBody2D.AddForce(new Vector2(-moveForce, 0.0f), ForceMode2D.Impulse);
+        if (_triggerDetector.inTrigger)
+            _rigidBody2D.AddForce(new Vector2(-moveForce, 0.0f), ForceMode2D.Impulse);
     }
 
     public void MoveRight()
     {
-        if (triggerDetector.inTrigger)
-            rigidBody2D.AddForce(new Vector2(moveForce, 0.0f), ForceMode2D.Impulse);
+        if (_triggerDetector.inTrigger)
+            _rigidBody2D.AddForce(new Vector2(moveForce, 0.0f), ForceMode2D.Impulse);
+    }
+
+    public void Jump()
+    {
+        if (_triggerDetector.inTrigger)
+        {
+            var directionalJumpForceX = _visualDirection > 0 ? jumpForceX : -jumpForceX;
+            _rigidBody2D.AddForce(new Vector2(directionalJumpForceX, jumpForceY), ForceMode2D.Impulse);
+        }
     }
 
     void Update()
     {
-        float velocity = rigidBody2D.velocity.x;
+        float velocityX = _rigidBody2D.velocity.x;
+        float velocityY = _rigidBody2D.velocity.y;
 
-        if (velocity < -0.01f)
-            visualDirection = -1.0f;
-        else if (velocity > 0.01f)
-            visualDirection = 1.0f;
+        if (velocityX < -0.01f)
+            _visualDirection = -1.0f;
+        else if (velocityX > 0.01f)
+            _visualDirection = 1.0f;
 
         Vector3 scale = visual.localScale;
-        scale.x = visualDirection;
+        scale.x = _visualDirection;
         visual.localScale = scale;
 
-        animator.SetFloat("speed", Mathf.Abs(velocity));
+        _animator.SetFloat(SpeedX, Mathf.Abs(velocityX));
+        _animator.SetFloat(SpeedY, velocityY);
+        _animator.SetBool(InAir, !_triggerDetector.inTrigger);
     }
 }
