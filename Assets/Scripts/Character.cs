@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class Character : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Character : MonoBehaviour
     private float _visualDirection;
 
     public Transform visual;
+    public TextMeshProUGUI gameOverText;
     public float moveForce;
     public float jumpForceX;
     public float jumpForceY;
@@ -26,19 +28,19 @@ public class Character : MonoBehaviour
 
     public void MoveLeft()
     {
-        if (_triggerDetector.inTrigger)
+        if (_triggerDetector.OnGround())
             _rigidBody2D.AddForce(new Vector2(-moveForce, 0.0f), ForceMode2D.Impulse);
     }
 
     public void MoveRight()
     {
-        if (_triggerDetector.inTrigger)
+        if (_triggerDetector.OnGround())
             _rigidBody2D.AddForce(new Vector2(moveForce, 0.0f), ForceMode2D.Impulse);
     }
 
     public void Jump()
     {
-        if (_triggerDetector.inTrigger)
+        if (_triggerDetector.OnGround())
         {
             var directionalJumpForceX = _visualDirection > 0 ? jumpForceX : -jumpForceX;
             _rigidBody2D.AddForce(new Vector2(directionalJumpForceX, jumpForceY), ForceMode2D.Impulse);
@@ -47,6 +49,11 @@ public class Character : MonoBehaviour
 
     void Update()
     {
+        if (_triggerDetector.Drawn())
+        {
+            OnGameOver();
+            return;
+        }
         float velocityX = _rigidBody2D.velocity.x;
         float velocityY = _rigidBody2D.velocity.y;
 
@@ -61,6 +68,12 @@ public class Character : MonoBehaviour
 
         _animator.SetFloat(SpeedX, Mathf.Abs(velocityX));
         _animator.SetFloat(SpeedY, velocityY);
-        _animator.SetBool(InAir, !_triggerDetector.inTrigger);
+        _animator.SetBool(InAir, _triggerDetector.InAir());
     }
+    
+    private void OnGameOver()
+    {
+        gameOverText.text = "Game Over";
+    }
+    
 }

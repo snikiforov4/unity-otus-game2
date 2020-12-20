@@ -6,4 +6,5 @@
 /[Uu]ser[Ss]ettings/
 /*.csproj
 /*.sln
+/*.user
 .idea
