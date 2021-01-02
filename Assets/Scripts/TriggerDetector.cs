@@ -7,9 +7,9 @@ public class TriggerDetector : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Water"))
+        if (collision.gameObject.CompareTag("Death"))
         {
-            _state = TriggerState.Drawn;
+            _state = TriggerState.Dead;
         }
         else
         {
@@ -19,13 +19,13 @@ public class TriggerDetector : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (_state == TriggerState.Drawn) return;
+        if (_state == TriggerState.Dead) return;
         _state = TriggerState.InAir;
     }
     
-    public bool Drawn()
+    public bool IsDead()
     {
-        return _state == TriggerState.Drawn;
+        return _state == TriggerState.Dead;
     }
     
     public bool InAir()

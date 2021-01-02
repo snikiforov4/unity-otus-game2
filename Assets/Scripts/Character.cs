@@ -49,7 +49,7 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        if (_triggerDetector.Drawn())
+        if (_triggerDetector.IsDead())
         {
             OnGameOver();
             return;
